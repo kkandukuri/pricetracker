@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Price Tracker - Web UI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🛒 E-Commerce Price Tracker</h1>
+            <p class="subtitle">Upload URLs, track progress, download results</p>
+        </header>
+
+        <!-- Statistics -->
+        <div class="stats-container" id="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="total-products">0</div>
+                <div class="stat-label">Total Products</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="running-jobs">0</div>
+                <div class="stat-label">Running Jobs</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="completed-jobs">0</div>
+                <div class="stat-label">Completed Jobs</div>
+            </div>
+        </div>
+
+        <!-- Upload Form -->
+        <div class="card">
+            <h2>📤 Upload URLs</h2>
+            <form id="upload-form">
+                <div class="form-group">
+                    <label for="file-input">Select File (.txt or .csv)</label>
+                    <input type="file" id="file-input" name="file" accept=".txt,.csv" required>
+                    <small>One URL per line (text file) or CSV with 'url' column</small>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="delay-input">Delay (seconds)</label>
+                        <input type="number" id="delay-input" name="delay" value="5" min="1" max="60" required>
+                        <small>Time between requests (recommended: 5+)</small>
+                    </div>
+
+                    <div class="form-group checkbox-group">
+                        <label>
+                            <input type="checkbox" id="selenium-input" name="selenium">
+                            Use Selenium (for JavaScript sites)
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="upload-btn">
+                    <span class="btn-text">Start Scraping</span>
+                    <span class="btn-spinner" style="display: none;">⏳</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- Jobs List -->
+        <div class="card">
+            <h2>📊 Scraping Jobs</h2>
+            <div id="jobs-container">
+                <p class="empty-state">No jobs yet. Upload a file to start scraping.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

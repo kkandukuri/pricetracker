@@ -114,6 +114,34 @@ python bulk_scraper.py urls.txt --delay 5
 
 **See [BULK_SCRAPING_GUIDE.md](BULK_SCRAPING_GUIDE.md) for complete documentation.**
 
+### Web UI (Upload Files & Monitor Progress)
+
+**NEW!** User-friendly web interface with real-time progress tracking:
+
+```bash
+# Start the web server
+python web_app.py
+
+# Open browser: http://localhost:5000
+```
+
+**Features:**
+- 📤 Upload URL files (.txt or .csv)
+- 📊 Real-time progress monitoring
+- 🔄 Background processing (continues even if you close browser)
+- 📥 Download CSV results when complete
+- 📱 Mobile-friendly interface
+- 🎯 Multiple concurrent jobs
+- ⚠️ Error tracking and reporting
+
+**Perfect for:**
+- Non-technical users
+- Long-running bulk scraping
+- Remote monitoring
+- Team collaboration
+
+**See [WEB_UI_GUIDE.md](WEB_UI_GUIDE.md) for complete documentation.**
+
 ## Project Structure
 
 ```
