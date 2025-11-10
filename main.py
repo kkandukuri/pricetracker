@@ -41,6 +41,15 @@ def main():
     history_parser.add_argument('--limit', type=int, default=10,
                                help='Number of records to show (default: 10)')
 
+    # Export command
+    export_parser = subparsers.add_parser('export', help='Export products to CSV')
+    export_parser.add_argument('--output', '-o', default='products.csv',
+                              help='Output CSV file (default: products.csv)')
+    export_parser.add_argument('--include-images', action='store_true',
+                              help='Include image URLs in export')
+    export_parser.add_argument('--include-metadata', action='store_true',
+                              help='Include additional metadata columns')
+
     args = parser.parse_args()
 
     # Initialize tracker
@@ -90,6 +99,23 @@ def main():
 
         elif args.command == 'history':
             tracker.display_price_history(args.product_id, args.limit)
+
+        elif args.command == 'export':
+            # Import export functionality
+            from export_csv import export_to_csv
+
+            products = tracker.get_all_products()
+            if not products:
+                print("No products to export. Add some products first.")
+                sys.exit(1)
+
+            print(f"\nExporting {len(products)} products to CSV...")
+            export_to_csv(
+                args.output,
+                include_images=args.include_images,
+                include_metadata=args.include_metadata
+            )
+            print(f"✓ Export completed: {args.output}")
 
         else:
             parser.print_help()
