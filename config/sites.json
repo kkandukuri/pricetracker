@@ -1,0 +1,47 @@
+{
+  "amazon.com": {
+    "name_selector": "#productTitle",
+    "price_selector": ".a-price-whole, #priceblock_ourprice, #priceblock_dealprice",
+    "description_selector": "#productDescription",
+    "image_selector": "#landingImage, #imgTagWrapperId img",
+    "currency_selector": ".a-price-symbol"
+  },
+  "ebay.com": {
+    "name_selector": "h1.x-item-title__mainTitle",
+    "price_selector": ".x-price-primary .ux-textspans",
+    "description_selector": ".x-item-description",
+    "image_selector": ".ux-image-carousel-item img"
+  },
+  "walmart.com": {
+    "name_selector": "h1[itemprop='name']",
+    "price_selector": "[itemprop='price']",
+    "description_selector": ".about-desc",
+    "image_selector": ".prod-hero-image img"
+  },
+  "etsy.com": {
+    "name_selector": "h1[data-buy-box-listing-title]",
+    "price_selector": "p[class*='price']",
+    "description_selector": "[data-product-details-description-text-content]",
+    "image_selector": ".wt-max-width-full img"
+  },
+  "bestbuy.com": {
+    "name_selector": ".sku-title h1",
+    "price_selector": ".priceView-hero-price span",
+    "description_selector": ".product-data-value",
+    "image_selector": ".primary-image"
+  },
+  "instacart.com": {
+    "name_selector": "h1[data-testid='product-title'], h1.e-1ydh7bl, h1",
+    "price_selector": "[data-testid='product-price'], .e-price, span[class*='price']",
+    "description_selector": "[data-testid='product-description'], .e-description, div[class*='description']",
+    "image_selector": "[data-testid='product-image'], img[class*='product'], img[alt*='product']",
+    "currency_selector": "span.currency, [data-testid='currency']"
+  },
+  "distacart.com": {
+    "name_selector": "h1.product-title, h1[data-product-name], h1",
+    "price_selector": ".product-price, [data-price], span.price, .price-amount",
+    "description_selector": ".product-description, [data-description], .description",
+    "image_selector": ".product-image img, [data-product-image], img.main-image",
+    "currency_selector": ".currency, [data-currency]"
+  }
+}

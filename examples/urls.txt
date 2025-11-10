@@ -1,0 +1,18 @@
+# Example URL List for Bulk Scraping
+# Lines starting with # are comments and will be ignored
+# Empty lines are also ignored
+# Add one product URL per line
+
+# Distacart Products
+https://distacart.com/products/mamaearth-onion-shampoo-for-hair-fall-control
+https://distacart.com/products/example-product-2
+https://distacart.com/products/example-product-3
+
+# You can add URLs from different sites
+# https://www.amazon.com/dp/PRODUCTID
+# https://www.walmart.com/ip/PRODUCTID
+
+# Tips:
+# - Start with a small list to test
+# - Use appropriate delays (--delay 5 or higher)
+# - For JavaScript sites, add --selenium flag
