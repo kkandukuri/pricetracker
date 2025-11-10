@@ -87,6 +87,33 @@ Refresh prices for all tracked products:
 python main.py update
 ```
 
+### Bulk Scraping (Scrape Multiple URLs)
+
+**NEW!** Scrape multiple product URLs from a list with automatic rate limiting:
+
+```bash
+# Create a file with URLs (one per line)
+# urls.txt:
+#   https://distacart.com/products/product1
+#   https://distacart.com/products/product2
+#   https://distacart.com/products/product3
+
+# Scrape all URLs with 5-second delay between requests
+python bulk_scraper.py urls.txt --delay 5
+
+# Or use the quick helper script
+./quick_bulk_scrape.sh urls.txt 5
+```
+
+**Features:**
+- Processes URLs one by one with configurable delays
+- Automatically skips already-tracked products
+- Shows progress and statistics
+- Handles errors gracefully and continues
+- Saves results to a file
+
+**See [BULK_SCRAPING_GUIDE.md](BULK_SCRAPING_GUIDE.md) for complete documentation.**
+
 ## Project Structure
 
 ```
