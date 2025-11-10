@@ -29,5 +29,19 @@
     "price_selector": ".priceView-hero-price span",
     "description_selector": ".product-data-value",
     "image_selector": ".primary-image"
+  },
+  "instacart.com": {
+    "name_selector": "h1[data-testid='product-title'], h1.e-1ydh7bl, h1",
+    "price_selector": "[data-testid='product-price'], .e-price, span[class*='price']",
+    "description_selector": "[data-testid='product-description'], .e-description, div[class*='description']",
+    "image_selector": "[data-testid='product-image'], img[class*='product'], img[alt*='product']",
+    "currency_selector": "span.currency, [data-testid='currency']"
+  },
+  "distacart.com": {
+    "name_selector": "h1.product-title, h1[data-product-name], h1",
+    "price_selector": ".product-price, [data-price], span.price, .price-amount",
+    "description_selector": ".product-description, [data-description], .description",
+    "image_selector": ".product-image img, [data-product-image], img.main-image",
+    "currency_selector": ".currency, [data-currency]"
   }
 }
