@@ -43,5 +43,12 @@
     "description_selector": ".product-description, [data-description], .description",
     "image_selector": ".product-image img, [data-product-image], img.main-image",
     "currency_selector": ".currency, [data-currency]"
+  },
+  "iherb.com": {
+    "name_selector": "h1#name, h1.product-title, h1[itemprop='name'], h1",
+    "price_selector": "#price, .price, .product-price, b[itemprop='price'], span[itemprop='price']",
+    "description_selector": "#product-summary, .product-description, [itemprop='description'], div.product-overview",
+    "image_selector": "#iherb-product-image, img[itemprop='image'], .product-image img",
+    "currency_selector": ".currency, span.currency-symbol"
   }
 }
