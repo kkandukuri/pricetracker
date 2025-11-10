@@ -1,0 +1,33 @@
+{
+  "amazon.com": {
+    "name_selector": "#productTitle",
+    "price_selector": ".a-price-whole, #priceblock_ourprice, #priceblock_dealprice",
+    "description_selector": "#productDescription",
+    "image_selector": "#landingImage, #imgTagWrapperId img",
+    "currency_selector": ".a-price-symbol"
+  },
+  "ebay.com": {
+    "name_selector": "h1.x-item-title__mainTitle",
+    "price_selector": ".x-price-primary .ux-textspans",
+    "description_selector": ".x-item-description",
+    "image_selector": ".ux-image-carousel-item img"
+  },
+  "walmart.com": {
+    "name_selector": "h1[itemprop='name']",
+    "price_selector": "[itemprop='price']",
+    "description_selector": ".about-desc",
+    "image_selector": ".prod-hero-image img"
+  },
+  "etsy.com": {
+    "name_selector": "h1[data-buy-box-listing-title]",
+    "price_selector": "p[class*='price']",
+    "description_selector": "[data-product-details-description-text-content]",
+    "image_selector": ".wt-max-width-full img"
+  },
+  "bestbuy.com": {
+    "name_selector": ".sku-title h1",
+    "price_selector": ".priceView-hero-price span",
+    "description_selector": ".product-data-value",
+    "image_selector": ".primary-image"
+  }
+}
