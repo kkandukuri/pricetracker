@@ -77,7 +77,7 @@ if aws lambda get-function --function-name $FUNCTION_NAME --region $REGION 2>/de
         --handler $HANDLER \
         --memory-size $MEMORY \
         --timeout $TIMEOUT \
-        --environment Variables={RATE_LIMIT=20,COUNTRY_CODE=US,CURRENCY=USD} \
+        --environment 'Variables={RATE_LIMIT=20,COUNTRY_CODE=US,CURRENCY=USD}' \
         --region $REGION
 else
     echo "Creating new function..."
@@ -89,7 +89,7 @@ else
         --zip-file fileb://lambda_upc_function.zip \
         --memory-size $MEMORY \
         --timeout $TIMEOUT \
-        --environment Variables={RATE_LIMIT=20,COUNTRY_CODE=US,CURRENCY=USD} \
+        --environment 'Variables={RATE_LIMIT=20,COUNTRY_CODE=US,CURRENCY=USD}' \
         --region $REGION
 fi
 
