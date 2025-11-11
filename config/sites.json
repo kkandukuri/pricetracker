@@ -4,44 +4,59 @@
     "price_selector": ".a-price-whole, #priceblock_ourprice, #priceblock_dealprice",
     "description_selector": "#productDescription",
     "image_selector": "#landingImage, #imgTagWrapperId img",
-    "currency_selector": ".a-price-symbol"
+    "currency_selector": ".a-price-symbol",
+    "upc_selector": "[itemprop='gtin13'], [itemprop='gtin12'], th:contains('UPC') + td, .prodDetAttrValue"
   },
   "ebay.com": {
     "name_selector": "h1.x-item-title__mainTitle",
     "price_selector": ".x-price-primary .ux-textspans",
     "description_selector": ".x-item-description",
-    "image_selector": ".ux-image-carousel-item img"
+    "image_selector": ".ux-image-carousel-item img",
+    "upc_selector": "[data-testid='ux-labels-values__values-content'], .ux-labels-values__values-content"
   },
   "walmart.com": {
     "name_selector": "h1[itemprop='name']",
     "price_selector": "[itemprop='price']",
     "description_selector": ".about-desc",
-    "image_selector": ".prod-hero-image img"
+    "image_selector": ".prod-hero-image img",
+    "upc_selector": "[itemprop='gtin13'], [itemprop='gtin12'], [data-testid='product-gtin']"
   },
   "etsy.com": {
     "name_selector": "h1[data-buy-box-listing-title]",
     "price_selector": "p[class*='price']",
     "description_selector": "[data-product-details-description-text-content]",
-    "image_selector": ".wt-max-width-full img"
+    "image_selector": ".wt-max-width-full img",
+    "upc_selector": ".product-details-list [data-product-details-value]"
   },
   "bestbuy.com": {
     "name_selector": ".sku-title h1",
     "price_selector": ".priceView-hero-price span",
     "description_selector": ".product-data-value",
-    "image_selector": ".primary-image"
+    "image_selector": ".primary-image",
+    "upc_selector": ".model-sku .product-data-value, [itemprop='gtin13']"
   },
   "instacart.com": {
     "name_selector": "h1[data-testid='product-title'], h1.e-1ydh7bl, h1",
     "price_selector": "[data-testid='product-price'], .e-price, span[class*='price']",
     "description_selector": "[data-testid='product-description'], .e-description, div[class*='description']",
     "image_selector": "[data-testid='product-image'], img[class*='product'], img[alt*='product']",
-    "currency_selector": "span.currency, [data-testid='currency']"
+    "currency_selector": "span.currency, [data-testid='currency']",
+    "upc_selector": "[data-testid='product-upc'], .product-upc, [itemprop='gtin13']"
   },
   "distacart.com": {
     "name_selector": "h1.product-title, h1[data-product-name], h1",
     "price_selector": ".product-price, [data-price], span.price, .price-amount",
     "description_selector": ".product-description, [data-description], .description",
     "image_selector": ".product-image img, [data-product-image], img.main-image",
-    "currency_selector": ".currency, [data-currency]"
+    "currency_selector": ".currency, [data-currency]",
+    "upc_selector": ".product-upc, [data-upc], .upc, [itemprop='gtin13']"
+  },
+  "iherb.com": {
+    "name_selector": "h1#name, h1.product-title, h1[itemprop='name'], h1",
+    "price_selector": "#price, .price, .product-price, b[itemprop='price'], span[itemprop='price']",
+    "description_selector": "#product-summary, .product-description, [itemprop='description'], div.product-overview",
+    "image_selector": "#iherb-product-image, img[itemprop='image'], .product-image img",
+    "currency_selector": ".currency, span.currency-symbol",
+    "upc_selector": "#product-specs-list [itemprop='gtin13'], .product-code, [data-upc]"
   }
 }

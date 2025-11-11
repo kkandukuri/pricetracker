@@ -52,7 +52,8 @@ class ProductScraper:
                 current_price=self._extract_price(soup),
                 currency=self._extract_currency(soup),
                 image_urls=self._extract_image_urls(soup),
-                site_name=site_name
+                site_name=site_name,
+                upc=self._extract_upc(soup)
             )
 
             return product
@@ -248,6 +249,108 @@ class ProductScraper:
 
         return image_urls[:5]  # Return max 5 images
 
+    def _extract_upc(self, soup: BeautifulSoup) -> str:
+        """Extract UPC/EAN/GTIN from the page."""
+        # Try configured selector first
+        if 'upc_selector' in self.config:
+            element = soup.select_one(self.config['upc_selector'])
+            if element:
+                upc = element.get_text(strip=True)
+                if self._is_valid_upc(upc):
+                    return upc
+
+        # Try meta tags for structured data
+        meta_selectors = [
+            'meta[property="product:upc"]',
+            'meta[itemprop="gtin12"]',
+            'meta[itemprop="gtin13"]',
+            'meta[itemprop="gtin14"]',
+            'meta[itemprop="gtin"]',
+            'meta[itemprop="ean"]',
+            'meta[itemprop="isbn"]',
+            'meta[name="upc"]',
+            'meta[name="gtin"]',
+        ]
+
+        for selector in meta_selectors:
+            meta = soup.select_one(selector)
+            if meta:
+                upc = meta.get('content', '')
+                if self._is_valid_upc(upc):
+                    return upc
+
+        # Common CSS selectors for UPC
+        selectors = [
+            '.upc',
+            '#upc',
+            '[data-upc]',
+            '.product-upc',
+            '.product-code',
+            '[itemprop="gtin12"]',
+            '[itemprop="gtin13"]',
+            '[itemprop="gtin14"]',
+            'span:contains("UPC")',
+            'span:contains("GTIN")',
+            'span:contains("EAN")',
+        ]
+
+        for selector in selectors:
+            element = soup.select_one(selector)
+            if element:
+                # For data attributes
+                if element.has_attr('data-upc'):
+                    upc = element.get('data-upc')
+                    if self._is_valid_upc(upc):
+                        return upc
+
+                # For text content
+                text = element.get_text(strip=True)
+                upc = self._extract_upc_from_text(text)
+                if upc:
+                    return upc
+
+        # Search entire page for UPC patterns in product details
+        product_sections = soup.select('.product-details, .product-info, #product-details, [id*="product"]')
+        for section in product_sections:
+            text = section.get_text()
+            upc = self._extract_upc_from_text(text)
+            if upc:
+                return upc
+
+        return ""
+
+    def _extract_upc_from_text(self, text: str) -> str:
+        """Extract UPC from text using regex patterns."""
+        # Remove whitespace and special characters
+        text = text.replace(' ', '').replace('-', '').replace(':', '')
+
+        # Look for UPC/GTIN/EAN followed by digits
+        patterns = [
+            r'UPC[:\s]*(\d{12,14})',
+            r'GTIN[:\s]*(\d{12,14})',
+            r'EAN[:\s]*(\d{12,14})',
+            r'ISBN[:\s]*(\d{10,13})',
+            r'\b(\d{12})\b',  # 12-digit UPC
+            r'\b(\d{13})\b',  # 13-digit EAN
+        ]
+
+        for pattern in patterns:
+            match = re.search(pattern, text, re.IGNORECASE)
+            if match:
+                upc = match.group(1) if match.lastindex else match.group(0)
+                if self._is_valid_upc(upc):
+                    return upc
+
+        return ""
+
+    def _is_valid_upc(self, upc: str) -> bool:
+        """Validate UPC format."""
+        # Remove non-digits
+        upc = re.sub(r'\D', '', upc)
+
+        # Valid UPC lengths: 10 (ISBN-10), 12 (UPC-A), 13 (EAN-13, ISBN-13), 14 (GTIN-14)
+        return len(upc) in [10, 12, 13, 14] and upc.isdigit()
+
 
 class SeleniumScraper(ProductScraper):
     """Scraper using Selenium for JavaScript-heavy sites."""
@@ -291,7 +394,8 @@ class SeleniumScraper(ProductScraper):
                 current_price=self._extract_price(soup),
                 currency=self._extract_currency(soup),
                 image_urls=self._extract_image_urls(soup),
-                site_name=site_name
+                site_name=site_name,
+                upc=self._extract_upc(soup)
             )
 
             return product
