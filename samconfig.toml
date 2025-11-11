@@ -1,0 +1,17 @@
+version = 0.1
+
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "upc-price-lookup-stack"
+s3_prefix = "upc-price-lookup"
+region = "us-east-1"
+confirm_changeset = false
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "RateLimit=20 CountryCode=US Currency=USD"
+image_repositories = []
+
+[default.build]
+[default.build.parameters]
+cached = true
+parallel = true
