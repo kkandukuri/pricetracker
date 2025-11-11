@@ -43,12 +43,8 @@
                     <div class="form-group">
                         <label for="test-url">Test URL</label>
                         <input type="url" id="test-url" class="form-control" placeholder="https://example.com/product/123">
-                        <small>Product URL to test selectors against</small>
+                        <small>Product URL to test selectors against (opens in new tab for inspection)</small>
                     </div>
-
-                    <button type="button" class="btn btn-primary" id="load-url-btn" style="margin-bottom: 20px;">
-                        🌐 Load URL in Viewer
-                    </button>
 
                     <h4 style="margin-top: 20px;">CSS Selectors</h4>
 
@@ -112,32 +108,69 @@
             </div>
         </div>
 
-        <!-- Right Panel: Website Viewer -->
+        <!-- Right Panel: DevTools Guide -->
         <div class="viewer-panel">
             <div class="card">
-                <div class="card-header">
-                    <h3>Website Viewer</h3>
-                    <div class="viewer-controls">
-                        <button type="button" class="btn btn-secondary btn-sm" id="inspect-mode-btn">
-                            🔍 Inspect Mode
-                        </button>
-                        <button type="button" class="btn btn-secondary btn-sm" id="refresh-iframe-btn">
-                            🔄 Refresh
-                        </button>
+                <h3>🛠️ How to Find CSS Selectors</h3>
+
+                <div class="devtools-guide">
+                    <div class="guide-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Open the Website</h4>
+                            <p>Enter a test URL above and click the button below to open it in a new tab</p>
+                            <button type="button" class="btn btn-primary" id="open-url-btn">
+                                🌐 Open Test URL in New Tab
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="guide-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Open Browser DevTools</h4>
+                            <p><strong>Right-click</strong> on any element (like product name, price, etc.) and select:</p>
+                            <ul>
+                                <li><strong>Chrome:</strong> "Inspect" or press <kbd>Ctrl+Shift+I</kbd> (Windows) / <kbd>Cmd+Option+I</kbd> (Mac)</li>
+                                <li><strong>Firefox:</strong> "Inspect Element" or press <kbd>Ctrl+Shift+C</kbd></li>
+                                <li><strong>Safari:</strong> Enable Dev Menu first, then "Inspect Element"</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="guide-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Copy the CSS Selector</h4>
+                            <p>In the DevTools Elements panel:</p>
+                            <ol>
+                                <li>Find the highlighted element (it will be selected automatically)</li>
+                                <li><strong>Right-click</strong> on the HTML tag in the inspector</li>
+                                <li>Select <strong>Copy → Copy selector</strong></li>
+                                <li>Paste it into the appropriate field on the left</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="guide-step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>Test Your Selector</h4>
+                            <p>Use the <strong>Test</strong> buttons to verify your selector finds the correct elements</p>
+                            <p>The test will show you what content is extracted from the page</p>
+                        </div>
                     </div>
                 </div>
 
-                <div class="iframe-container" id="iframe-container">
-                    <div class="iframe-placeholder">
-                        <p>💡 Enter a test URL and click "Load URL in Viewer" to see the website here</p>
-                        <p style="color:#666;font-size:0.9rem;">You can inspect elements and copy their CSS selectors</p>
-                    </div>
-                </div>
-
-                <div class="inspector-info" id="inspector-info" style="display:none;">
-                    <strong>Inspector Mode Active</strong>
-                    <p>Click on elements in the viewer to get their CSS selector</p>
-                    <div id="selected-selector"></div>
+                <div class="devtools-tips">
+                    <h4>💡 Pro Tips</h4>
+                    <ul>
+                        <li><strong>Use specific selectors:</strong> Prefer classes and IDs over generic tags</li>
+                        <li><strong>Avoid position-based selectors:</strong> nth-child() may break if layout changes</li>
+                        <li><strong>Test multiple products:</strong> Make sure your selector works on different product pages</li>
+                        <li><strong>Simplify selectors:</strong> Remove unnecessary parent classes for better compatibility</li>
+                        <li><strong>Use comma-separated selectors:</strong> Provide fallbacks (e.g., ".price, .product-price")</li>
+                    </ul>
                 </div>
             </div>
 
@@ -231,30 +264,81 @@
     font-size: 0.85rem;
 }
 
-.iframe-container {
-    width: 100%;
-    height: 600px;
-    border: 2px solid #e0e0e0;
-    border-radius: 8px;
-    overflow: hidden;
-    position: relative;
-}
-
-.iframe-container iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-}
-
-.iframe-placeholder {
+.devtools-guide {
     display: flex;
     flex-direction: column;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.guide-step {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    gap: 15px;
+    padding: 20px;
+    background: #f9fafb;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 50%;
+    display: flex;
     align-items: center;
     justify-content: center;
-    height: 100%;
-    background: #f9fafb;
-    padding: 40px;
-    text-align: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.step-content h4 {
+    margin: 0 0 10px 0;
+    color: #1f2937;
+}
+
+.step-content p, .step-content ul, .step-content ol {
+    margin: 10px 0;
+    color: #4b5563;
+    line-height: 1.6;
+}
+
+.step-content ul, .step-content ol {
+    padding-left: 20px;
+}
+
+.step-content kbd {
+    background: #374151;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+}
+
+.devtools-tips {
+    background: #ecfdf5;
+    border: 2px solid #10b981;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.devtools-tips h4 {
+    margin: 0 0 15px 0;
+    color: #065f46;
+}
+
+.devtools-tips ul {
+    margin: 0;
+    padding-left: 20px;
+    color: #065f46;
+}
+
+.devtools-tips li {
+    margin-bottom: 8px;
+    line-height: 1.6;
 }
 
 .test-output {
@@ -277,23 +361,6 @@
 
 .test-result.error {
     border-left-color: #ef4444;
-}
-
-.inspector-info {
-    background: #fef3c7;
-    border: 2px solid #fbbf24;
-    padding: 15px;
-    border-radius: 8px;
-    margin-top: 10px;
-}
-
-#selected-selector {
-    margin-top: 10px;
-    padding: 10px;
-    background: white;
-    border-radius: 6px;
-    font-family: 'Courier New', monospace;
-    word-break: break-all;
 }
 
 .selector-reference {

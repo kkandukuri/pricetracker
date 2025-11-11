@@ -2,7 +2,6 @@
 
 let sitesConfig = {};
 let currentSite = null;
-let inspectMode = false;
 
 // Load configuration on page load
 document.addEventListener('DOMContentLoaded', () => {
@@ -31,13 +30,13 @@ function setupEventListeners() {
         }
     });
 
-    // Load URL button
-    document.getElementById('load-url-btn').addEventListener('click', () => {
+    // Open URL button (opens in new tab)
+    document.getElementById('open-url-btn').addEventListener('click', () => {
         const url = document.getElementById('test-url').value.trim();
         if (url) {
-            loadUrlInIframe(url);
+            openUrlInNewTab(url);
         } else {
-            alert('Please enter a test URL');
+            alert('Please enter a test URL first');
         }
     });
 
@@ -62,19 +61,6 @@ function setupEventListeners() {
             const field = btn.getAttribute('data-field');
             testSelector(field);
         });
-    });
-
-    // Inspect mode
-    document.getElementById('inspect-mode-btn').addEventListener('click', () => {
-        toggleInspectMode();
-    });
-
-    // Refresh iframe
-    document.getElementById('refresh-iframe-btn').addEventListener('click', () => {
-        const iframe = document.querySelector('#iframe-container iframe');
-        if (iframe) {
-            iframe.src = iframe.src;
-        }
     });
 }
 
@@ -309,51 +295,33 @@ async function testSelector(fieldName) {
     }
 }
 
-function loadUrlInIframe(url) {
-    const container = document.getElementById('iframe-container');
+function openUrlInNewTab(url) {
+    // Validate URL
+    try {
+        new URL(url);
+    } catch (e) {
+        alert('Please enter a valid URL (e.g., https://example.com/product/123)');
+        return;
+    }
 
-    // Remove placeholder or existing iframe
-    container.innerHTML = '';
+    // Open URL in new tab
+    const newTab = window.open(url, '_blank');
 
-    // Create iframe
-    const iframe = document.createElement('iframe');
-    iframe.src = url;
-    iframe.sandbox = 'allow-scripts allow-same-origin';
-    iframe.style.width = '100%';
-    iframe.style.height = '100%';
-    iframe.style.border = 'none';
-
-    iframe.onerror = () => {
-        container.innerHTML = `
-            <div class="iframe-placeholder">
-                <p style="color:#ef4444;">❌ Failed to load URL</p>
-                <p style="color:#666;">The website may block iframe embedding (CORS policy)</p>
-                <p style="color:#666;">Try using browser DevTools to inspect the page instead</p>
-            </div>
-        `;
-    };
-
-    container.appendChild(iframe);
-
-    // Show message about iframe limitations
-    alert('Note: Some websites block iframe embedding. If the page doesn\'t load, use browser DevTools to inspect elements instead.');
-}
-
-function toggleInspectMode() {
-    inspectMode = !inspectMode;
-
-    const btn = document.getElementById('inspect-mode-btn');
-    const info = document.getElementById('inspector-info');
-
-    if (inspectMode) {
-        btn.textContent = '🔍 Inspect Mode: ON';
-        btn.style.background = '#10b981';
-        info.style.display = 'block';
-
-        alert('Inspect mode enabled!\n\nNote: Due to browser security, you cannot inspect elements inside the iframe.\n\nInstead:\n1. Right-click the page in the iframe\n2. Select "Inspect" or "Inspect Element"\n3. Use browser DevTools to find CSS selectors');
+    if (newTab) {
+        // Show instructions after a brief delay
+        setTimeout(() => {
+            alert('✅ Website opened in new tab!\n\n' +
+                  '📋 Next Steps:\n\n' +
+                  '1. Right-click on the element you want to select (product name, price, etc.)\n\n' +
+                  '2. Select "Inspect" or "Inspect Element"\n\n' +
+                  '3. In DevTools, right-click the highlighted HTML element\n\n' +
+                  '4. Select "Copy → Copy selector"\n\n' +
+                  '5. Paste the selector into the appropriate field here\n\n' +
+                  '6. Click "Test" to verify it works!\n\n' +
+                  'Tip: You can switch between tabs using Alt+Tab (Windows) or Cmd+Tab (Mac)');
+        }, 500);
     } else {
-        btn.textContent = '🔍 Inspect Mode';
-        btn.style.background = '';
-        info.style.display = 'none';
+        alert('⚠️ Pop-up blocked!\n\nYour browser blocked the new tab. Please:\n\n' +
+              '1. Allow pop-ups for this site\n2. Or manually copy and paste the URL into a new tab');
     }
 }
