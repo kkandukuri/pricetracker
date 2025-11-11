@@ -35,10 +35,18 @@ class Database:
                 currency TEXT DEFAULT 'USD',
                 image_urls TEXT,
                 site_name TEXT,
+                upc TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
+
+        # Migrate existing databases by adding upc column if it doesn't exist
+        try:
+            cursor.execute("SELECT upc FROM products LIMIT 1")
+        except sqlite3.OperationalError:
+            # Column doesn't exist, add it
+            cursor.execute("ALTER TABLE products ADD COLUMN upc TEXT")
 
         # Price history table
         cursor.execute("""
@@ -67,11 +75,11 @@ class Database:
 
         cursor.execute("""
             INSERT INTO products (url, name, description, current_price,
-                                 currency, image_urls, site_name)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+                                 currency, image_urls, site_name, upc)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """, (product.url, product.name, product.description,
               product.current_price, product.currency,
-              image_urls_json, product.site_name))
+              image_urls_json, product.site_name, product.upc))
 
         self.conn.commit()
         product_id = cursor.lastrowid
@@ -92,10 +100,10 @@ class Database:
         cursor.execute("""
             UPDATE products
             SET name = ?, description = ?, current_price = ?,
-                currency = ?, image_urls = ?, updated_at = CURRENT_TIMESTAMP
+                currency = ?, image_urls = ?, upc = ?, updated_at = CURRENT_TIMESTAMP
             WHERE url = ?
         """, (product.name, product.description, product.current_price,
-              product.currency, image_urls_json, product.url))
+              product.currency, image_urls_json, product.upc, product.url))
 
         self.conn.commit()
 
@@ -168,6 +176,7 @@ class Database:
             currency=row['currency'],
             image_urls=image_urls,
             site_name=row['site_name'],
+            upc=row['upc'] or "",
             created_at=datetime.fromisoformat(row['created_at']) if row['created_at'] else None,
             updated_at=datetime.fromisoformat(row['updated_at']) if row['updated_at'] else None
         )

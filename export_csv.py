@@ -207,6 +207,7 @@ def export_to_csv(output_file: str, include_images: bool = False,
         # Define CSV columns in the exact order requested
         columns = [
             'URL',
+            'UPC',
             'NAME',
             'Description',
             'ShortDescription',
@@ -256,6 +257,7 @@ def export_to_csv(output_file: str, include_images: bool = False,
                 # Build row
                 row = {
                     'URL': product.url,
+                    'UPC': product.upc,
                     'NAME': product.name,
                     'Description': product.description,
                     'ShortDescription': short_desc,
@@ -383,6 +385,7 @@ Examples:
 CSV Format:
   Standard columns (always included):
     - URL: Product URL
+    - UPC: Universal Product Code (UPC/EAN/GTIN/ISBN if found)
     - NAME: Product name
     - Description: Full product description
     - ShortDescription: First 100 characters of description

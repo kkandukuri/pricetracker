@@ -15,6 +15,7 @@ class Product:
     currency: str = "USD"
     image_urls: List[str] = None
     site_name: str = ""
+    upc: str = ""
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
