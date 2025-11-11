@@ -14,6 +14,7 @@ from flask import Flask, render_template, request, jsonify, send_file
 from werkzeug.utils import secure_filename
 
 from src.tracker import PriceTracker
+from upc_price_lookup import UPCPriceLookup
 
 
 # Configuration
@@ -35,6 +36,10 @@ Path('data').mkdir(exist_ok=True)
 # Job storage
 jobs = {}
 jobs_lock = threading.Lock()
+
+# UPC job storage
+upc_jobs = {}
+upc_jobs_lock = threading.Lock()
 
 
 def load_jobs():
@@ -165,8 +170,20 @@ def scrape_job(job_id, urls, delay, use_selenium):
 
 @app.route('/')
 def index():
-    """Render main page."""
-    return render_template('index.html')
+    """Render product scraper page."""
+    return render_template('scraper.html')
+
+
+@app.route('/upc')
+def upc_lookup():
+    """Render UPC lookup page."""
+    return render_template('upc_lookup.html')
+
+
+@app.route('/products')
+def products():
+    """Render products page."""
+    return render_template('products.html')
 
 
 @app.route('/api/upload', methods=['POST'])
@@ -316,6 +333,57 @@ def get_stats():
         }
 
         return jsonify(stats)
+    finally:
+        db.close()
+
+
+@app.route('/api/upc/lookup', methods=['POST'])
+def upc_lookup_single():
+    """Look up a single UPC code."""
+    data = request.get_json()
+    upc = data.get('upc')
+
+    if not upc:
+        return jsonify({'error': 'UPC code required'}), 400
+
+    rate_limit = int(data.get('rate_limit', 20))
+    country = data.get('country', 'US')
+    currency = data.get('currency', 'USD')
+
+    try:
+        lookup = UPCPriceLookup(rate_limit=rate_limit, country_code=country, currency=currency)
+        result = lookup.lookup_upc(upc)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/products/all')
+def get_all_products():
+    """Get all products from database."""
+    from src.database import Database
+
+    db = Database()
+    try:
+        products = db.get_all_products()
+
+        products_data = []
+        for p in products:
+            products_data.append({
+                'id': p.id,
+                'url': p.url,
+                'name': p.name,
+                'description': p.description[:100] + '...' if len(p.description) > 100 else p.description,
+                'price': p.current_price,
+                'currency': p.currency,
+                'upc': p.upc,
+                'site': p.site_name,
+                'images': p.image_urls[:1] if p.image_urls else [],
+                'created_at': str(p.created_at),
+                'updated_at': str(p.updated_at)
+            })
+
+        return jsonify(products_data)
     finally:
         db.close()
 

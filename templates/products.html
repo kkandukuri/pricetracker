@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Products{% endblock %}
+
+{% block content %}
+<div class="container">
+    <header class="page-header">
+        <h2>📊 All Products</h2>
+        <p class="subtitle">View all tracked products and price history</p>
+    </header>
+
+    <!-- Product Statistics -->
+    <div class="stats-container" id="product-stats">
+        <div class="stat-card">
+            <div class="stat-value" id="total-tracked">0</div>
+            <div class="stat-label">Total Tracked</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="price-drops">0</div>
+            <div class="stat-label">Price Drops</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="avg-price">$0.00</div>
+            <div class="stat-label">Avg Price</div>
+        </div>
+    </div>
+
+    <!-- Products Table -->
+    <div class="card">
+        <div class="card-header">
+            <h3>Product List</h3>
+            <button class="btn btn-secondary" id="export-btn">
+                📥 Export CSV
+            </button>
+        </div>
+        <div id="products-container">
+            <div class="loading">Loading products...</div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='products.js') }}"></script>
+{% endblock %}
