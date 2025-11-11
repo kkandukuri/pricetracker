@@ -183,7 +183,7 @@ if aws lambda get-function --function-name $FUNCTION_NAME --region $REGION 2>/de
         --handler $HANDLER \
         --memory-size $MEMORY \
         --timeout $TIMEOUT \
-        --environment Variables="{RATE_LIMIT=${RATE_LIMIT},COUNTRY_CODE=${COUNTRY_CODE},CURRENCY=${CURRENCY}}" \
+        --environment Variables={RATE_LIMIT=${RATE_LIMIT},COUNTRY_CODE=${COUNTRY_CODE},CURRENCY=${CURRENCY}} \
         --region $REGION > /dev/null
 
     echo -e "${GREEN}✓ Function updated${NC}"
@@ -198,7 +198,7 @@ else
         --zip-file fileb://lambda_upc_function.zip \
         --memory-size $MEMORY \
         --timeout $TIMEOUT \
-        --environment Variables="{RATE_LIMIT=${RATE_LIMIT},COUNTRY_CODE=${COUNTRY_CODE},CURRENCY=${CURRENCY}}" \
+        --environment Variables={RATE_LIMIT=${RATE_LIMIT},COUNTRY_CODE=${COUNTRY_CODE},CURRENCY=${CURRENCY}} \
         --region $REGION > /dev/null
 
     echo -e "${GREEN}✓ Function created${NC}"
