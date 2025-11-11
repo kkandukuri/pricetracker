@@ -186,6 +186,12 @@ def products():
     return render_template('products.html')
 
 
+@app.route('/config')
+def site_config():
+    """Render site configuration page."""
+    return render_template('site_config.html')
+
+
 @app.route('/api/upload', methods=['POST'])
 def upload_file():
     """Handle file upload and start scraping job."""
@@ -386,6 +392,109 @@ def get_all_products():
         return jsonify(products_data)
     finally:
         db.close()
+
+
+@app.route('/api/sites/config', methods=['GET'])
+def get_sites_config():
+    """Get current sites configuration."""
+    config_path = Path('config/sites.json')
+
+    if not config_path.exists():
+        return jsonify({'error': 'Configuration file not found'}), 404
+
+    try:
+        with open(config_path, 'r') as f:
+            config = json.load(f)
+        return jsonify(config)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/sites/config', methods=['POST'])
+def update_sites_config():
+    """Update sites configuration."""
+    data = request.get_json()
+
+    if not data:
+        return jsonify({'error': 'No configuration data provided'}), 400
+
+    config_path = Path('config/sites.json')
+
+    try:
+        # Backup existing config
+        if config_path.exists():
+            backup_path = Path(f'config/sites.json.backup.{int(time.time())}')
+            import shutil
+            shutil.copy(config_path, backup_path)
+
+        # Write new config
+        with open(config_path, 'w') as f:
+            json.dump(data, f, indent=2)
+
+        return jsonify({'success': True, 'message': 'Configuration updated successfully'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/sites/test', methods=['POST'])
+def test_selector():
+    """Test a CSS selector against a URL."""
+    data = request.get_json()
+
+    url = data.get('url')
+    selector = data.get('selector')
+    field_type = data.get('field_type', 'text')
+
+    if not url or not selector:
+        return jsonify({'error': 'URL and selector required'}), 400
+
+    try:
+        import requests
+        from bs4 import BeautifulSoup
+
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
+
+        response = requests.get(url, headers=headers, timeout=10)
+        response.raise_for_status()
+
+        soup = BeautifulSoup(response.content, 'lxml')
+
+        # Try to find elements
+        elements = soup.select(selector)
+
+        if not elements:
+            return jsonify({
+                'found': False,
+                'count': 0,
+                'message': f'No elements found matching selector: {selector}'
+            })
+
+        # Extract values based on field type
+        results = []
+        for i, elem in enumerate(elements[:5]):  # Limit to first 5
+            if field_type == 'image':
+                value = elem.get('src') or elem.get('data-src') or elem.get('data-lazy-src')
+            else:
+                value = elem.get_text(strip=True)
+
+            results.append({
+                'index': i + 1,
+                'value': value[:200] if value else '(empty)',  # Limit length
+                'tag': elem.name,
+                'classes': elem.get('class', [])
+            })
+
+        return jsonify({
+            'found': True,
+            'count': len(elements),
+            'results': results,
+            'message': f'Found {len(elements)} element(s)'
+        })
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 if __name__ == '__main__':

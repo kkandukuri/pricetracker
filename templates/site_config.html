@@ -1,0 +1,345 @@
+{% extends "base.html" %}
+
+{% block title %}Site Configuration{% endblock %}
+
+{% block content %}
+<div class="container">
+    <header class="page-header">
+        <h2>⚙️ Site Configuration Editor</h2>
+        <p class="subtitle">Configure CSS selectors for different e-commerce sites</p>
+    </header>
+
+    <div class="config-layout">
+        <!-- Left Panel: Configuration Form -->
+        <div class="config-panel">
+            <div class="card">
+                <h3>Site Configuration</h3>
+
+                <!-- Site Selector -->
+                <div class="form-group">
+                    <label for="site-select">Select Site</label>
+                    <select id="site-select" class="form-control">
+                        <option value="">-- Select a site to edit --</option>
+                    </select>
+                </div>
+
+                <div class="form-actions" style="margin-bottom: 20px;">
+                    <button type="button" class="btn btn-secondary" id="new-site-btn">
+                        ➕ Add New Site
+                    </button>
+                    <button type="button" class="btn btn-danger" id="delete-site-btn" style="display:none;">
+                        🗑️ Delete Site
+                    </button>
+                </div>
+
+                <!-- Configuration Form -->
+                <form id="config-form">
+                    <div class="form-group">
+                        <label for="site-domain">Site Domain *</label>
+                        <input type="text" id="site-domain" class="form-control" placeholder="example.com" required>
+                        <small>Domain name without www (e.g., amazon.com, iherb.com)</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="test-url">Test URL</label>
+                        <input type="url" id="test-url" class="form-control" placeholder="https://example.com/product/123">
+                        <small>Product URL to test selectors against</small>
+                    </div>
+
+                    <button type="button" class="btn btn-primary" id="load-url-btn" style="margin-bottom: 20px;">
+                        🌐 Load URL in Viewer
+                    </button>
+
+                    <h4 style="margin-top: 20px;">CSS Selectors</h4>
+
+                    <div class="form-group">
+                        <label for="name-selector">Product Name Selector</label>
+                        <input type="text" id="name-selector" class="form-control" placeholder="h1.product-title, h1">
+                        <small>CSS selector(s) for product name, comma-separated</small>
+                        <button type="button" class="btn btn-test" data-field="name">Test</button>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="price-selector">Price Selector</label>
+                        <input type="text" id="price-selector" class="form-control" placeholder=".price, .product-price">
+                        <small>CSS selector(s) for price</small>
+                        <button type="button" class="btn btn-test" data-field="price">Test</button>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description-selector">Description Selector</label>
+                        <input type="text" id="description-selector" class="form-control" placeholder=".description, #product-description">
+                        <small>CSS selector(s) for description</small>
+                        <button type="button" class="btn btn-test" data-field="description">Test</button>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="image-selector">Image Selector</label>
+                        <input type="text" id="image-selector" class="form-control" placeholder=".product-image img, #main-image">
+                        <small>CSS selector(s) for product images</small>
+                        <button type="button" class="btn btn-test" data-field="image">Test</button>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="currency-selector">Currency Selector (Optional)</label>
+                        <input type="text" id="currency-selector" class="form-control" placeholder=".currency, .price-currency">
+                        <small>CSS selector(s) for currency symbol</small>
+                        <button type="button" class="btn btn-test" data-field="currency">Test</button>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="upc-selector">UPC Selector (Optional)</label>
+                        <input type="text" id="upc-selector" class="form-control" placeholder="[itemprop='gtin13'], .product-upc">
+                        <small>CSS selector(s) for UPC/GTIN code</small>
+                        <button type="button" class="btn btn-test" data-field="upc">Test</button>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-success" id="save-config-btn">
+                            💾 Save Configuration
+                        </button>
+                        <button type="button" class="btn btn-secondary" id="reset-form-btn">
+                            🔄 Reset
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Test Results -->
+            <div class="card" id="test-results" style="display:none;">
+                <h3>Test Results</h3>
+                <div id="test-output" class="test-output"></div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Website Viewer -->
+        <div class="viewer-panel">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Website Viewer</h3>
+                    <div class="viewer-controls">
+                        <button type="button" class="btn btn-secondary btn-sm" id="inspect-mode-btn">
+                            🔍 Inspect Mode
+                        </button>
+                        <button type="button" class="btn btn-secondary btn-sm" id="refresh-iframe-btn">
+                            🔄 Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <div class="iframe-container" id="iframe-container">
+                    <div class="iframe-placeholder">
+                        <p>💡 Enter a test URL and click "Load URL in Viewer" to see the website here</p>
+                        <p style="color:#666;font-size:0.9rem;">You can inspect elements and copy their CSS selectors</p>
+                    </div>
+                </div>
+
+                <div class="inspector-info" id="inspector-info" style="display:none;">
+                    <strong>Inspector Mode Active</strong>
+                    <p>Click on elements in the viewer to get their CSS selector</p>
+                    <div id="selected-selector"></div>
+                </div>
+            </div>
+
+            <!-- Quick Reference -->
+            <div class="card">
+                <h3>📚 CSS Selector Quick Reference</h3>
+                <div class="selector-reference">
+                    <div class="ref-item">
+                        <code>.class-name</code>
+                        <span>Select by class</span>
+                    </div>
+                    <div class="ref-item">
+                        <code>#id-name</code>
+                        <span>Select by ID</span>
+                    </div>
+                    <div class="ref-item">
+                        <code>tag.class</code>
+                        <span>Tag with class</span>
+                    </div>
+                    <div class="ref-item">
+                        <code>[attribute='value']</code>
+                        <span>By attribute</span>
+                    </div>
+                    <div class="ref-item">
+                        <code>parent > child</code>
+                        <span>Direct child</span>
+                    </div>
+                    <div class="ref-item">
+                        <code>sel1, sel2</code>
+                        <span>Multiple selectors</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.config-layout {
+    display: grid;
+    grid-template-columns: 450px 1fr;
+    gap: 20px;
+    align-items: start;
+}
+
+.config-panel, .viewer-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-family: 'Courier New', monospace;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-test {
+    background: #667eea;
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    margin-top: 8px;
+}
+
+.btn-test:hover {
+    background: #5568d3;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+}
+
+.iframe-container {
+    width: 100%;
+    height: 600px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+}
+
+.iframe-container iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.iframe-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background: #f9fafb;
+    padding: 40px;
+    text-align: center;
+}
+
+.test-output {
+    background: #f9fafb;
+    padding: 15px;
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.test-result {
+    margin-bottom: 10px;
+    padding: 10px;
+    background: white;
+    border-radius: 6px;
+    border-left: 4px solid #10b981;
+}
+
+.test-result.error {
+    border-left-color: #ef4444;
+}
+
+.inspector-info {
+    background: #fef3c7;
+    border: 2px solid #fbbf24;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+#selected-selector {
+    margin-top: 10px;
+    padding: 10px;
+    background: white;
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    word-break: break-all;
+}
+
+.selector-reference {
+    display: grid;
+    gap: 10px;
+}
+
+.ref-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background: #f9fafb;
+    border-radius: 6px;
+}
+
+.ref-item code {
+    background: #667eea;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+}
+
+.ref-item span {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.viewer-controls {
+    display: flex;
+    gap: 10px;
+}
+
+@media (max-width: 1200px) {
+    .config-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .iframe-container {
+        height: 400px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='site_config.js') }}"></script>
+{% endblock %}

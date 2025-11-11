@@ -27,6 +27,10 @@
                     <span class="nav-icon">📊</span>
                     Products
                 </a>
+                <a href="{{ url_for('site_config') }}" class="nav-link {% if request.endpoint == 'site_config' %}active{% endif %}">
+                    <span class="nav-icon">⚙️</span>
+                    Sites Config
+                </a>
             </div>
         </div>
     </nav>
