@@ -120,19 +120,33 @@ class UPCPriceLookup:
                     # Get the first matching product
                     product = products[0]
 
+                    # Calculate discount percentage
+                    list_price = float(product.get('listPriceAmount', 0))
+                    discount_price = float(product.get('discountPriceAmount', 0))
+                    discount = 0
+                    if list_price > 0 and discount_price < list_price:
+                        discount = int(((list_price - discount_price) / list_price) * 100)
+
+                    # Build image URL from image code
+                    image_code = product.get('image', '')
+                    image_url = ''
+                    if image_code:
+                        # iHerb image URL format: https://s3.images-iherb.com/[code]/[size].jpg
+                        image_url = f"https://s3.images-iherb.com/{image_code}/l.jpg"
+
                     return {
                         'upc': upc,
                         'product_id': product.get('id', ''),
-                        'name': product.get('name', ''),
-                        'url': f"https://www.iherb.com/pr/{product.get('partNumber', '')}",
-                        'price': product.get('price', 0),
-                        'list_price': product.get('listPrice', 0),
+                        'name': product.get('displayName', ''),
+                        'url': product.get('url', ''),
+                        'price': discount_price,
+                        'list_price': list_price,
                         'currency': self.currency,
-                        'discount': product.get('discount', 0),
-                        'rating': product.get('rating', 0),
-                        'reviews': product.get('reviews', 0),
-                        'in_stock': product.get('inStock', False),
-                        'image_url': product.get('image', ''),
+                        'discount': discount,
+                        'rating': product.get('averageRating', 0),
+                        'reviews': product.get('ratingCount', 0),
+                        'in_stock': True,  # iHerb API returns products only if in stock
+                        'image_url': image_url,
                         'brand': product.get('brand', ''),
                         'found': True,
                         'timestamp': datetime.now().isoformat()
