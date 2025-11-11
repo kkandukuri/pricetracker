@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}UPC Lookup{% endblock %}
+
+{% block content %}
+<div class="container">
+    <header class="page-header">
+        <h2>🔍 UPC Price Lookup</h2>
+        <p class="subtitle">Query product prices using UPC/EAN/GTIN codes via iHerb API</p>
+    </header>
+
+    <!-- UPC Statistics -->
+    <div class="stats-container" id="upc-stats">
+        <div class="stat-card">
+            <div class="stat-value" id="upc-total">0</div>
+            <div class="stat-label">Total Lookups</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="upc-found">0</div>
+            <div class="stat-label">Products Found</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="upc-rate">20</div>
+            <div class="stat-label">Rate Limit (calls/min)</div>
+        </div>
+    </div>
+
+    <!-- Single UPC Lookup -->
+    <div class="card">
+        <h3>🔎 Single UPC Lookup</h3>
+        <form id="single-upc-form">
+            <div class="form-group">
+                <label for="upc-input">Enter UPC Code</label>
+                <input type="text" id="upc-input" name="upc" placeholder="733739004536" pattern="[0-9]{10,14}" required>
+                <small>Enter 10-14 digit UPC/EAN/GTIN code</small>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="lookup-btn">
+                <span class="btn-text">Look Up Price</span>
+                <span class="btn-spinner" style="display: none;">⏳</span>
+            </button>
+        </form>
+
+        <!-- Single Result Display -->
+        <div id="single-result" style="display: none; margin-top: 20px;">
+            <h4>Product Details</h4>
+            <div id="product-card" class="product-card"></div>
+        </div>
+    </div>
+
+    <!-- Batch UPC Lookup -->
+    <div class="card">
+        <h3>📤 Batch UPC Lookup</h3>
+        <form id="batch-upc-form">
+            <div class="form-group">
+                <label for="upc-file-input">Upload UPC File (.txt or .csv)</label>
+                <input type="file" id="upc-file-input" name="file" accept=".txt,.csv" required>
+                <small>One UPC per line (text file) or CSV with 'UPC' column</small>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="rate-limit-input">Rate Limit (calls/min)</label>
+                    <input type="number" id="rate-limit-input" name="rate_limit" value="20" min="1" max="60" required>
+                    <small>Recommended: 10-20 calls/min</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="country-input">Country</label>
+                    <select id="country-input" name="country">
+                        <option value="US" selected>United States (US)</option>
+                        <option value="CA">Canada (CA)</option>
+                        <option value="GB">United Kingdom (GB)</option>
+                        <option value="AU">Australia (AU)</option>
+                        <option value="DE">Germany (DE)</option>
+                        <option value="FR">France (FR)</option>
+                        <option value="JP">Japan (JP)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="currency-input">Currency</label>
+                    <select id="currency-input" name="currency">
+                        <option value="USD" selected>USD ($)</option>
+                        <option value="CAD">CAD ($)</option>
+                        <option value="GBP">GBP (£)</option>
+                        <option value="AUD">AUD ($)</option>
+                        <option value="EUR">EUR (€)</option>
+                        <option value="JPY">JPY (¥)</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="batch-lookup-btn">
+                <span class="btn-text">Start Batch Lookup</span>
+                <span class="btn-spinner" style="display: none;">⏳</span>
+            </button>
+        </form>
+    </div>
+
+    <!-- Batch Jobs List -->
+    <div class="card">
+        <h3>📊 UPC Lookup Jobs</h3>
+        <div id="upc-jobs-container">
+            <p class="empty-state">No batch jobs yet. Upload a file to start batch lookup.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='upc_lookup.js') }}"></script>
+{% endblock %}

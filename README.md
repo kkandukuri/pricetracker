@@ -4,15 +4,44 @@ A powerful and flexible Python-based price tracker for monitoring product prices
 
 ## Features
 
-- **Multi-site Support**: Works with Amazon, eBay, Walmart, Etsy, Best Buy, and more
+### Core Price Tracking
+- **Multi-site Support**: Works with Amazon, eBay, Walmart, Etsy, Best Buy, Instacart, iHerb, and more
 - **Flexible Scraping**: Supports both simple HTTP requests and Selenium for JavaScript-heavy sites
 - **Price History**: Automatically tracks price changes over time
-- **Product Information**: Extracts product name, description, price, currency, and image URLs
+- **Product Information**: Extracts name, description, price, currency, image URLs, and UPC codes
 - **Site Configuration**: Easy-to-configure site-specific selectors
 - **SQLite Database**: Lightweight database for storing products and price history
 - **CLI Interface**: Simple command-line interface for managing tracked products
 
-## Installation
+### UPC Price Lookup (NEW! 🎉)
+- **UPC/EAN/GTIN Lookup**: Query product prices directly via UPC codes
+- **iHerb API Integration**: Fast price lookups without web scraping
+- **Configurable Rate Limiting**: Default 20 calls/min (customizable)
+- **Batch Processing**: Process hundreds of UPCs from files
+- **CSV Export**: Detailed product data with 15+ fields
+
+### AWS Lambda Deployment (NEW! 🚀)
+- **One-Click Deployment**: Deploy to AWS Lambda in under 2 minutes
+- **Serverless Architecture**: No infrastructure to maintain
+- **API Gateway Integration**: REST API endpoint automatically created
+- **Cost-Effective**: ~$1.50/month or FREE with AWS Free Tier
+- **Auto-Scaling**: Handles concurrent requests automatically
+
+## Quick Start
+
+### 🚀 AWS Lambda Deployment (Recommended)
+
+Deploy the UPC lookup tool to AWS Lambda in 3 commands:
+
+```bash
+cd pricetracker
+chmod +x deployment/one_click_deploy.sh
+./deployment/one_click_deploy.sh
+```
+
+**See [QUICKSTART_LAMBDA.md](QUICKSTART_LAMBDA.md) for complete Lambda deployment guide.**
+
+### 💻 Local Installation
 
 1. Clone the repository:
 ```bash
@@ -113,6 +142,40 @@ python bulk_scraper.py urls.txt --delay 5
 - Saves results to a file
 
 **See [BULK_SCRAPING_GUIDE.md](BULK_SCRAPING_GUIDE.md) for complete documentation.**
+
+### UPC Price Lookup
+
+**NEW!** 🎉 Query product prices directly using UPC/EAN/GTIN codes via iHerb API:
+
+```bash
+# Single UPC lookup
+python upc_price_lookup.py --upc 733739004536
+
+# Multiple UPCs from file
+python upc_price_lookup.py --file examples/upcs.txt --rate-limit 20 --output results.csv
+
+# Batch lookup with custom settings
+python upc_price_lookup.py --file upcs.csv --country CA --currency CAD
+```
+
+**Features:**
+- Configurable rate limiting (default: 20 calls/min)
+- Browser-like headers to avoid blocking
+- Batch processing from text or CSV files
+- Detailed CSV export with 15+ fields (Price, Brand, Rating, Reviews, Stock, etc.)
+- AWS Lambda deployment support for serverless execution
+
+**AWS Lambda Deployment:**
+```bash
+# One-click deployment
+./deployment/one_click_deploy.sh
+
+# Or using AWS SAM
+sam build && sam deploy --guided
+```
+
+**See [docs/UPC_PRICE_LOOKUP_GUIDE.md](docs/UPC_PRICE_LOOKUP_GUIDE.md) for complete documentation.**
+**See [QUICKSTART_LAMBDA.md](QUICKSTART_LAMBDA.md) for Lambda deployment guide.**
 
 ### Web UI (Upload Files & Monitor Progress)
 

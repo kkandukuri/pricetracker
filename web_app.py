@@ -14,6 +14,7 @@ from flask import Flask, render_template, request, jsonify, send_file
 from werkzeug.utils import secure_filename
 
 from src.tracker import PriceTracker
+from upc_price_lookup import UPCPriceLookup
 
 
 # Configuration
@@ -35,6 +36,10 @@ Path('data').mkdir(exist_ok=True)
 # Job storage
 jobs = {}
 jobs_lock = threading.Lock()
+
+# UPC job storage
+upc_jobs = {}
+upc_jobs_lock = threading.Lock()
 
 
 def load_jobs():
@@ -165,8 +170,26 @@ def scrape_job(job_id, urls, delay, use_selenium):
 
 @app.route('/')
 def index():
-    """Render main page."""
-    return render_template('index.html')
+    """Render product scraper page."""
+    return render_template('scraper.html')
+
+
+@app.route('/upc')
+def upc_lookup():
+    """Render UPC lookup page."""
+    return render_template('upc_lookup.html')
+
+
+@app.route('/products')
+def products():
+    """Render products page."""
+    return render_template('products.html')
+
+
+@app.route('/config')
+def site_config():
+    """Render site configuration page."""
+    return render_template('site_config.html')
 
 
 @app.route('/api/upload', methods=['POST'])
@@ -318,6 +341,160 @@ def get_stats():
         return jsonify(stats)
     finally:
         db.close()
+
+
+@app.route('/api/upc/lookup', methods=['POST'])
+def upc_lookup_single():
+    """Look up a single UPC code."""
+    data = request.get_json()
+    upc = data.get('upc')
+
+    if not upc:
+        return jsonify({'error': 'UPC code required'}), 400
+
+    rate_limit = int(data.get('rate_limit', 20))
+    country = data.get('country', 'US')
+    currency = data.get('currency', 'USD')
+
+    try:
+        lookup = UPCPriceLookup(rate_limit=rate_limit, country_code=country, currency=currency)
+        result = lookup.lookup_upc(upc)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/products/all')
+def get_all_products():
+    """Get all products from database."""
+    from src.database import Database
+
+    db = Database()
+    try:
+        products = db.get_all_products()
+
+        products_data = []
+        for p in products:
+            products_data.append({
+                'id': p.id,
+                'url': p.url,
+                'name': p.name,
+                'description': p.description[:100] + '...' if len(p.description) > 100 else p.description,
+                'price': p.current_price,
+                'currency': p.currency,
+                'upc': p.upc,
+                'site': p.site_name,
+                'images': p.image_urls[:1] if p.image_urls else [],
+                'created_at': str(p.created_at),
+                'updated_at': str(p.updated_at)
+            })
+
+        return jsonify(products_data)
+    finally:
+        db.close()
+
+
+@app.route('/api/sites/config', methods=['GET'])
+def get_sites_config():
+    """Get current sites configuration."""
+    config_path = Path('config/sites.json')
+
+    if not config_path.exists():
+        return jsonify({'error': 'Configuration file not found'}), 404
+
+    try:
+        with open(config_path, 'r') as f:
+            config = json.load(f)
+        return jsonify(config)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/sites/config', methods=['POST'])
+def update_sites_config():
+    """Update sites configuration."""
+    data = request.get_json()
+
+    if not data:
+        return jsonify({'error': 'No configuration data provided'}), 400
+
+    config_path = Path('config/sites.json')
+
+    try:
+        # Backup existing config
+        if config_path.exists():
+            backup_path = Path(f'config/sites.json.backup.{int(time.time())}')
+            import shutil
+            shutil.copy(config_path, backup_path)
+
+        # Write new config
+        with open(config_path, 'w') as f:
+            json.dump(data, f, indent=2)
+
+        return jsonify({'success': True, 'message': 'Configuration updated successfully'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/sites/test', methods=['POST'])
+def test_selector():
+    """Test a CSS selector against a URL."""
+    data = request.get_json()
+
+    url = data.get('url')
+    selector = data.get('selector')
+    field_type = data.get('field_type', 'text')
+
+    if not url or not selector:
+        return jsonify({'error': 'URL and selector required'}), 400
+
+    try:
+        import requests
+        from bs4 import BeautifulSoup
+
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
+
+        response = requests.get(url, headers=headers, timeout=10)
+        response.raise_for_status()
+
+        soup = BeautifulSoup(response.content, 'lxml')
+
+        # Try to find elements
+        elements = soup.select(selector)
+
+        if not elements:
+            return jsonify({
+                'found': False,
+                'count': 0,
+                'message': f'No elements found matching selector: {selector}'
+            })
+
+        # Extract values based on field type
+        results = []
+        for i, elem in enumerate(elements[:5]):  # Limit to first 5
+            if field_type == 'image':
+                value = elem.get('src') or elem.get('data-src') or elem.get('data-lazy-src')
+            else:
+                value = elem.get_text(strip=True)
+
+            results.append({
+                'index': i + 1,
+                'value': value[:200] if value else '(empty)',  # Limit length
+                'tag': elem.name,
+                'classes': elem.get('class', [])
+            })
+
+        return jsonify({
+            'found': True,
+            'count': len(elements),
+            'results': results,
+            'message': f'Found {len(elements)} element(s)'
+        })
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 if __name__ == '__main__':

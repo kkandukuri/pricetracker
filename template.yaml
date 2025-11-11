@@ -1,0 +1,131 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: UPC Price Lookup Lambda Function with API Gateway
+
+# Global configuration for all resources
+Globals:
+  Function:
+    Timeout: 300
+    MemorySize: 512
+    Runtime: python3.11
+    Environment:
+      Variables:
+        RATE_LIMIT: 20
+        COUNTRY_CODE: US
+        CURRENCY: USD
+
+# Parameters allow customization at deploy time
+Parameters:
+  RateLimit:
+    Type: Number
+    Default: 20
+    Description: Maximum API calls per minute
+    MinValue: 1
+    MaxValue: 60
+
+  CountryCode:
+    Type: String
+    Default: US
+    Description: Country code for pricing (US, CA, GB, etc.)
+    AllowedValues:
+      - US
+      - CA
+      - GB
+      - AU
+      - DE
+      - FR
+      - JP
+
+  Currency:
+    Type: String
+    Default: USD
+    Description: Currency code
+    AllowedValues:
+      - USD
+      - CAD
+      - GBP
+      - AUD
+      - EUR
+      - JPY
+
+# Resources to create
+Resources:
+  # Lambda Function
+  UPCPriceLookupFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: upc-price-lookup
+      CodeUri: .
+      Handler: lambda_upc_handler.lambda_handler
+      Description: UPC Price Lookup via iHerb API
+      Timeout: 300
+      MemorySize: 512
+      Environment:
+        Variables:
+          RATE_LIMIT: !Ref RateLimit
+          COUNTRY_CODE: !Ref CountryCode
+          CURRENCY: !Ref Currency
+      Events:
+        # HTTP API endpoint
+        HttpApiEvent:
+          Type: HttpApi
+          Properties:
+            Path: /lookup
+            Method: POST
+            ApiId: !Ref UPCPriceLookupApi
+      # CloudWatch Logs
+      Policies:
+        - CloudWatchLogsFullAccess
+
+  # HTTP API Gateway
+  UPCPriceLookupApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: prod
+      Description: API for UPC Price Lookup
+      CorsConfiguration:
+        AllowOrigins:
+          - "*"
+        AllowMethods:
+          - POST
+          - GET
+        AllowHeaders:
+          - Content-Type
+          - Authorization
+
+  # CloudWatch Log Group
+  FunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${UPCPriceLookupFunction}
+      RetentionInDays: 7
+
+# Outputs - display after deployment
+Outputs:
+  UPCPriceLookupFunction:
+    Description: Lambda Function ARN
+    Value: !GetAtt UPCPriceLookupFunction.Arn
+    Export:
+      Name: UPCPriceLookupFunctionArn
+
+  FunctionName:
+    Description: Lambda Function Name
+    Value: !Ref UPCPriceLookupFunction
+
+  ApiEndpoint:
+    Description: API Gateway Endpoint URL
+    Value: !Sub "https://${UPCPriceLookupApi}.execute-api.${AWS::Region}.amazonaws.com/prod/lookup"
+    Export:
+      Name: UPCPriceLookupApiEndpoint
+
+  ApiId:
+    Description: API Gateway ID
+    Value: !Ref UPCPriceLookupApi
+
+  Region:
+    Description: Deployed Region
+    Value: !Ref AWS::Region
+
+  AccountId:
+    Description: AWS Account ID
+    Value: !Ref AWS::AccountId

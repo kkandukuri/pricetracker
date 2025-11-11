@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Product Scraper{% endblock %}
+
+{% block content %}
+<div class="container">
+    <header class="page-header">
+        <h2>📦 Product Scraper</h2>
+        <p class="subtitle">Upload URLs, track progress, download results</p>
+    </header>
+
+    <!-- Statistics -->
+    <div class="stats-container" id="stats">
+        <div class="stat-card">
+            <div class="stat-value" id="total-products">0</div>
+            <div class="stat-label">Total Products</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="running-jobs">0</div>
+            <div class="stat-label">Running Jobs</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="completed-jobs">0</div>
+            <div class="stat-label">Completed Jobs</div>
+        </div>
+    </div>
+
+    <!-- Upload Form -->
+    <div class="card">
+        <h3>📤 Upload URLs</h3>
+        <form id="upload-form">
+            <div class="form-group">
+                <label for="file-input">Select File (.txt or .csv)</label>
+                <input type="file" id="file-input" name="file" accept=".txt,.csv" required>
+                <small>One URL per line (text file) or CSV with 'url' column</small>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="delay-input">Delay (seconds)</label>
+                    <input type="number" id="delay-input" name="delay" value="5" min="1" max="60" required>
+                    <small>Time between requests (recommended: 5+)</small>
+                </div>
+
+                <div class="form-group checkbox-group">
+                    <label>
+                        <input type="checkbox" id="selenium-input" name="selenium">
+                        Use Selenium (for JavaScript sites)
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="upload-btn">
+                <span class="btn-text">Start Scraping</span>
+                <span class="btn-spinner" style="display: none;">⏳</span>
+            </button>
+        </form>
+    </div>
+
+    <!-- Jobs List -->
+    <div class="card">
+        <h3>📊 Scraping Jobs</h3>
+        <div id="jobs-container">
+            <p class="empty-state">No jobs yet. Upload a file to start scraping.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+{% endblock %}

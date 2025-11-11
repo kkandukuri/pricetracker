@@ -1,0 +1,14 @@
+# Example UPC codes for testing
+# One UPC per line, lines starting with # are ignored
+
+# NOW Foods products
+733739004536
+733739004543
+
+# Example generic UPCs
+012345678905
+098765432109
+
+# iHerb product codes also work
+NOW-00453
+NOW-04536
